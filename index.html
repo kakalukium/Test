@@ -1,308 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document Hub — shadcn UI</title>
-  <style>
-    /* ── shadcn/ui-inspired design tokens ─────────────────────────────── */
-    :root {
-      /* Colors — gray scale + accent */
-      --background: 0 0% 100%;
-      --foreground: 224 71.4% 4.1%;
-      --card: 0 0% 100%;
-      --card-foreground: 224 71.4% 4.1%;
-      --popover: 0 0% 100%;
-      --popover-foreground: 224 71.4% 4.1%;
-      --primary: 21 91% 58%; /* orange-500 */
-      --primary-foreground: 0 0% 100%;
-      --secondary: 240 4.8% 95.9%;
-      --secondary-foreground: 224 71.4% 4.1%;
-      --muted: 240 4.8% 95.9%;
-      --muted-foreground: 215.4 16.3% 46.9%;
-      --accent: 240 4.8% 95.9%;
-      --accent-foreground: 224 71.4% 4.1%;
-      --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 0 0% 100%;
-      --border: 220 13% 91%;
-      --input: 220 13% 91%;
-      --ring: 21 91% 58%;
-      --radius: 0.5rem;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Your Static Document Hub</title>
+    <style>
+        /* Base Notion-like Dark Mode Styles */
+        :root {
+            --bg: #1e1e1e; --card: #2a2a2a; --text: #ffffff;
+            --subtle: #999999; --accent: #007bff;
+        }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 20px;
+        }
+        #app-container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Layer 1 - Hub Styles */
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .doc-card {
+            background: var(--card); border-radius: 8px; padding: 20px;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            min-height: 100px;
+        }
+        .doc-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); }
+        .doc-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 5px; }
+        .doc-description { color: var(--subtle); font-size: 0.9rem; }
 
-      /* Typography */
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    }
+        /* Layer 2 - Posts Table Styles */
+        .search { width: 100%; padding: 10px 15px; margin-bottom: 20px; background: var(--card); border: 1px solid #444; border-radius: 4px; color: white; box-sizing: border-box; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; max-width: 900px; margin: 0 auto; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; font-size: 0.95rem; }
+        th { color: var(--subtle); font-weight: 500; }
+        tr:hover { background: rgba(255, 255, 255, 0.05); cursor: pointer; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --background: 224 71.4% 4.1%;
-        --foreground: 215.4 16.3% 62.4%;
-        --card: 224 71.4% 4.1%;
-        --card-foreground: 215.4 16.3% 62.4%;
-        --popover: 224 71.4% 4.1%;
-        --popover-foreground: 215.4 16.3% 62.4%;
-        --primary: 21 91% 58%;
-        --primary-foreground: 0 0% 100%;
-        --secondary: 240 3.7% 15.9%;
-        --secondary-foreground: 224 71.4% 4.1%;
-        --muted: 240 3.7% 15.9%;
-        --muted-foreground: 215.4 16.3% 46.9%;
-        --accent: 240 3.7% 15.9%;
-        --accent-foreground: 215.4 16.3% 62.4%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 0% 100%;
-        --border: 240 3.7% 15.9%;
-        --input: 240 3.7% 15.9%;
-        --ring: 21 91% 58%;
-      }
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: var(--font-sans);
-      background-color: hsl(var(--background));
-      color: hsl(var(--foreground));
-      padding: 1.5rem;
-      min-height: 100vh;
-    }
-
-    /* ── Layout & Grid ────────────────────────────────────────────────── */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid hsl(var(--border));
-    }
-
-    /* ── Typography ───────────────────────────────────────────────────── */
-    .text-lg {
-      font-size: 1.125rem;
-      line-height: 1.75rem;
-    }
-    .text-xl {
-      font-size: 1.25rem;
-      line-height: 1.75rem;
-      font-weight: 600;
-    }
-    .text-2xl {
-      font-size: 1.5rem;
-      line-height: 2rem;
-      font-weight: 700;
-    }
-    .font-medium {
-      font-weight: 500;
-    }
-    .font-semibold {
-      font-weight: 600;
-    }
-    .text-muted-foreground {
-      color: hsl(var(--muted-foreground));
-    }
-
-    /* ── shadcn-inspired Button ───────────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      border-radius: var(--radius);
-      font-weight: 500;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      line-height: 1.25rem;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
-      user-select: none;
-    }
-
-    .btn-secondary {
-      background-color: hsl(var(--secondary));
-      color: hsl(var(--secondary-foreground));
-      border: 1px solid hsl(var(--border));
-    }
-    .btn-secondary:hover {
-      background-color: hsl(var(--accent));
-      color: hsl(var(--accent-foreground));
-    }
-
-    .btn-primary {
-      background-color: hsl(var(--primary));
-      color: hsl(var(--primary-foreground));
-      border: 1px solid hsl(var(--primary));
-    }
-    .btn-primary:hover {
-      opacity: 0.9;
-    }
-
-    /* ── shadcn Card ──────────────────────────────────────────────────── */
-    .card {
-      background-color: hsl(var(--card));
-      border: 1px solid hsl(var(--border));
-      border-radius: var(--radius);
-      padding: 1rem;
-      transition: box-shadow 0.2s, background-color 0.2s;
-    }
-    .card:hover {
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    .card-subtitle {
-      font-size: 0.875rem;
-      color: hsl(var(--muted-foreground));
-      margin-bottom: 0.5rem;
-    }
-
-    .card-description {
-      font-size: 0.875rem;
-      line-height: 1.5;
-      margin-bottom: 0.5rem;
-    }
-
-    /* ── Grid ─────────────────────────────────────────────────────────── */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    /* ── New Doc Card — dashed + subtle ───────────────────────────────── */
-    .new-doc-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 150px;
-      border: 2px dashed hsl(var(--border));
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .new-doc-card:hover {
-      background-color: hsl(var(--muted));
-    }
-
-    .icon {
-      width: 1.5rem;
-      height: 1.5rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ── Responsive ───────────────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-      }
-      .nav-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-    }
-  </style>
+        /* Layer 3 - Post Detail Styles */
+        #post-content h1 { font-size: 2.5rem; margin-top: 0; }
+        .meta { color: var(--subtle); margin-bottom: 20px; font-size: 0.9rem; }
+        .content-container { border: 1px solid #333; border-radius: 6px; margin-bottom: 30px; overflow: hidden; }
+        #cryptpad-embed { width: 100%; height: 80vh; border: none; background: #1a1a1a; display: block; }
+        #static-content { padding: 20px; line-height: 1.7; background: var(--card); }
+        .comments { margin-top: 30px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header — shadcn-inspired layout -->
-    <header class="header">
-      <div>
-        <h1 class="text-2xl">Document Hub</h1>
-        <p class="text-muted-foreground text-sm mt-1">
-          Create and collaborate on documents in one place.
-        </p>
-      </div>
-      <div class="nav-actions">
-        <button class="btn btn-secondary">⭐ All Docs</button>
-        <button class="btn btn-secondary">👤 My Docs</button>
-        <button class="btn btn-secondary">≡</button>
-        <button class="btn btn-secondary">↑↓</button>
-        <button class="btn btn-primary">New ▾</button>
-      </div>
-    </header>
 
-    <!-- Grid of Docs — shadcn Card pattern -->
-    <main class="grid">
-      <!-- Sample Doc 1 -->
-      <div class="card">
-        <div class="flex justify-between items-start">
-          <h3 class="card-title">Background</h3>
-          <button class="text-muted-foreground hover:text-foreground">⋯</button>
-        </div>
-        <p class="card-subtitle">Analysis</p>
-        <p class="card-description">
-          Research findings, data insights, and key considerations
-        </p>
-        <p class="card-subtitle">Recommendations</p>
-        <p class="card-description">New doc</p>
-        <div class="mt-2 text-sm text-muted-foreground flex items-center gap-1">
-          <span>💬</span> 1
-        </div>
-      </div>
+    <!-- This is the container where all views will be loaded into -->
+    <div id="app-container">
+        <!-- Content from hub.html, posts.html, or post.html will be injected here -->
+    </div>
 
-      <!-- Sample Doc 2 -->
-      <div class="card">
-        <div class="flex justify-between items-start">
-          <h3 class="card-title">Test 1</h3>
-          <button class="text-muted-foreground hover:text-foreground">⋯</button>
-        </div>
-      </div>
+    <!-- 💡 JAVASCRIPT LOGIC AND DATA -->
+    <script>
+        // === CORE DATA (Scalable Content) ===
+        const POSTS_DATA = [
+            { id: "archetype", title: "The Male Archetype in Modern Society", date: "2025-11-09", tags: ["philosophy", "gender"], category: "essays", cryptpad_url: "https://cryptpad.fr/pad/#/2/pad/view/ABC123/" },
+            { id: "truth-blogging", title: "Truth Social as Macro-Blogging", date: "2025-11-05", tags: ["social media"], category: "rants", content: '<p>Truth Social occupies a unique niche, proving that a single-author, non-interactive format can still drive conversation. This is static HTML content.</p>' },
+            { id: "rant-1", title: "Why Modern Dating is Broken", date: "2025-11-03", tags: ["rant", "relationships"], category: "rants", cryptpad_url: "https://cryptpad.fr/code/#/2/code/view/XYZ789/" },
+            { id: "research-1", title: "Data on Male Loneliness (2025)", date: "2025-11-01", tags: ["data", "psychology"], category: "research", content: '<p>Recent studies show a sharp rise in self-reported male loneliness. See the source <a href="#">here</a>.</p>' },
+            // ADD MORE POSTS HERE TO SCALE YOUR SITE
+        ];
 
-      <!-- More sample docs… -->
-      <div class="card">
-        <h3 class="card-title">Project Brief</h3>
-        <p class="card-description">Goals, stakeholders, timeline, and success metrics.</p>
-        <p class="card-subtitle">Team</p>
-        <p class="card-description">Sambhav, Alex, Taylor</p>
-      </div>
+        const POSTS_MAP = POSTS_DATA.reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+        const CATEGORIES = {
+            essays: { title: "📝 Essays", description: "Long-form reflections on power, culture, and identity." },
+            rants: { title: "🔥 Rants", description: "Raw, unfiltered takes on society and hypocrisy." },
+            research: { title: "🔬 Research", description: "Data, sources, and deep analysis." },
+            drafts: { title: "✒️ Drafts", description: "Works in progress — feedback welcome." }
+        };
 
-      <div class="card">
-        <h3 class="card-title">User Interviews</h3>
-        <p class="card-description">Summary of 12 interviews, key themes, quotes.</p>
-        <p class="card-subtitle">Insight</p>
-        <p class="card-description">Trust > Features</p>
-      </div>
-
-      <!-- New Doc Card — uses same card style -->
-      <div class="card new-doc-card">
-        <div class="icon">+</div>
-        <span class="text-muted-foreground text-sm mt-2">New doc</span>
-      </div>
-    </main>
-  </div>
-
-  <script>
-    // Optional: Add lightweight interactivity (e.g., hover feedback, new doc prompt)
-    document.querySelectorAll('.new-doc-card').forEach(el => {
-      el.addEventListener('click', () => {
-        const title = prompt('Enter document title:');
-        if (title) {
-          alert(`✅ Created: "${title}"\n(Not saved — this is a prototype!)`);
+        // === Navigation/Routing ===
+        function navigate(view, params = {}) {
+            const url = new URL(window.location.href.split('?')[0]);
+            url.searchParams.set('view', view);
+            for (const key in params) { url.searchParams.set(key, params[key]); }
+            history.pushState(params, view, url.toString());
+            render();
         }
-      });
-    });
-  </script>
+
+        window.addEventListener('popstate', render);
+        
+        // === View Loader & Initializers ===
+
+        async function loadView(viewName, params = {}) {
+            const container = document.getElementById('app-container');
+            container.innerHTML = '<h1>Loading...</h1>'; // Temporary Loading Text
+
+            try {
+                // 1. Fetch the HTML file fragment
+                const response = await fetch(`${viewName}.html`);
+                if (!response.ok) throw new Error(`Could not load ${viewName}.html`);
+                const htmlContent = await response.text();
+                
+                // 2. Inject the HTML into the container
+                container.innerHTML = htmlContent;
+
+                // 3. Run the initializer specific to the loaded view
+                switch (viewName) {
+                    case 'hub':
+                        initHub();
+                        break;
+                    case 'posts':
+                        initPostsTable(params.category);
+                        break;
+                    case 'post':
+                        initPostDetail(params.id);
+                        break;
+                }
+            } catch (error) {
+                container.innerHTML = `<h1>🚨 Error loading content</h1><p>Check the file ${viewName}.html and your console for details.</p>`;
+                console.error("View Load Error:", error);
+            }
+        }
+
+        // === Layer 1 Initializer: Hub ===
+        function initHub() {
+            document.getElementById('page-title').textContent = 'Document Hub';
+            const content = document.querySelector('.main-content');
+            content.innerHTML = ''; // Clear existing cards
+
+            for (const key in CATEGORIES) {
+                const card = document.createElement('div');
+                card.className = 'doc-card';
+                card.innerHTML = `<div class="doc-title">${CATEGORIES[key].title}</div><div class="doc-description">${CATEGORIES[key].description}</div>`;
+                // Attach event listener after the card is in the DOM
+                card.onclick = () => navigate('posts', { category: key }); 
+                content.appendChild(card);
+            }
+        }
+
+        // === Layer 2 Initializer: Posts Table ===
+        function initPostsTable(category) {
+            const catTitle = CATEGORIES[category] ? CATEGORIES[category].title.replace(/[^a-zA-Z\s]/g, '') : 'All';
+            document.getElementById('category-title').textContent = `${catTitle.trim()} Posts`;
+            document.getElementById('page-title').textContent = `${catTitle.trim()} Posts`;
+            const tbody = document.querySelector('#post-table tbody');
+            tbody.innerHTML = ''; 
+
+            const filteredPosts = POSTS_DATA.filter(p => p.category === category);
+            
+            // Render Posts
+            filteredPosts.forEach(p => {
+                const row = tbody.insertRow();
+                row.dataset.id = p.id;
+                row.onclick = () => navigate('post', { id: p.id }); // Click to Layer 3
+                row.innerHTML = `<td>${p.title}</td><td>${p.date}</td><td>${p.tags.join(', ')}</td>`;
+            });
+
+            // Search/Filter Logic
+            document.getElementById('search').oninput = (e) => {
+                const q = e.target.value.toLowerCase();
+                [...tbody.rows].forEach(row => {
+                    const txt = row.textContent.toLowerCase();
+                    row.style.display = txt.includes(q) ? '' : 'none';
+                });
+            };
+        }
+
+        // === Layer 3 Initializer: Post Detail ===
+        function initPostDetail(id) {
+            const post = POSTS_MAP[id];
+            if (!post) { alert('Post not found!'); navigate('hub'); return; }
+            
+            document.getElementById('post-title').textContent = post.title;
+            document.getElementById('page-title').textContent = post.title;
+            document.getElementById('post-meta').textContent = `${post.date} • ${post.tags.join(', ')}`;
+
+            const staticContentDiv = document.getElementById('static-content');
+            const cryptpadIframe = document.getElementById('cryptpad-embed');
+            
+            // Content Logic: CryptPad Embed vs. Static Content
+            if (post.cryptpad_url) {
+                staticContentDiv.style.display = 'none';
+                cryptpadIframe.style.display = 'block';
+                const embedUrl = post.cryptpad_url.replace('/edit/', '/view/') + '?embed=1'; 
+                cryptpadIframe.src = embedUrl;
+            } else {
+                staticContentDiv.style.display = 'block';
+                cryptpadIframe.style.display = 'none';
+                staticContentDiv.innerHTML = post.content || 'No content available for this post.';
+            }
+
+            // Cusdis Comment Setup
+            const cusdisThread = document.getElementById('cusdis_thread');
+            // REPLACE 'YOUR_APP_ID' with your actual Cusdis App ID
+            cusdisThread.dataset.host = "https://cusdis.com"; 
+            cusdisThread.dataset.appId = "YOUR_APP_ID"; // <-- CHANGE THIS
+            cusdisThread.dataset.pageId = post.id;
+            cusdisThread.dataset.pageUrl = window.location.href;
+            cusdisThread.dataset.pageTitle = post.title;
+            
+            // Re-initialize Cusdis for SPA behavior
+            if (window.Cusdis) { window.Cusdis.initial(); }
+        }
+
+
+        // === Main Router Function (Determines which file to load) ===
+        function render() {
+            const params = new URLSearchParams(window.location.search);
+            const view = params.get('view') || 'hub';
+
+            switch (view) {
+                case 'hub':
+                case 'posts':
+                case 'post':
+                    loadView(view, { category: params.get('category'), id: params.get('id') });
+                    break;
+                default:
+                    loadView('hub');
+            }
+        }
+
+        // Initialize App on Load
+        window.onload = () => {
+             // Force an initial render based on the URL or default to 'hub'
+             render();
+        };
+
+    </script>
 </body>
 </html>

@@ -1,0 +1,20 @@
+<!-- Layer 3: Post Detail View (Loaded into index.html) -->
+<div id="post-content" style="max-width: 800px; margin: 0 auto;">
+    <h1 id="post-title"></h1>
+    <div class="meta" id="post-meta"></div>
+
+    <div class="content-container">
+        <!-- CryptPad Embed or Static Content is injected/toggled here -->
+        <div id="static-content"></div>
+        <iframe id="cryptpad-embed" title="Post Content Embed"></iframe>
+    </div>
+    
+    <!-- Cusdis Comment Section -->
+    <div class="comments">
+        <hr style="border-color: #333;">
+        <h3 style="color: var(--text);">💬 Comments</h3>
+        <!-- Cusdis Thread (initialized by initPostDetail) -->
+        <div id="cusdis_thread"></div>
+        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+    </div>
+</div>
