@@ -5,225 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Your Static Document Hub</title>
     <style>
-        /* Base Notion-like Dark Mode Styles */
-        :root {
-            --bg: #1e1e1e; --card: #2a2a2a; --text: #ffffff;
-            --subtle: #999999; --accent: #007bff;
-        }
-        body {
-            background: var(--bg); color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; padding: 20px;
-        }
+        :root { --bg: #1e1e1e; --card: #2a2a2a; --text: #ffffff; --subtle: #999999; --accent: #007bff; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 20px; }
         #app-container { max-width: 1200px; margin: 0 auto; }
-        
-        /* Layer 1 - Hub Styles */
-        .main-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
-        .doc-card {
-            background: var(--card); border-radius: 8px; padding: 20px;
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-            min-height: 100px;
-        }
-        .doc-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); }
+        .main-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .doc-card { background: var(--card); border-radius: 8px; padding: 20px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; min-height: 100px; }
+        .doc-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .doc-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 5px; }
         .doc-description { color: var(--subtle); font-size: 0.9rem; }
-
-        /* Layer 2 - Posts Table Styles */
         .search { width: 100%; padding: 10px 15px; margin-bottom: 20px; background: var(--card); border: 1px solid #444; border-radius: 4px; color: white; box-sizing: border-box; font-size: 1rem; }
         table { width: 100%; border-collapse: collapse; max-width: 900px; margin: 0 auto; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; font-size: 0.95rem; }
         th { color: var(--subtle); font-weight: 500; }
-        tr:hover { background: rgba(255, 255, 255, 0.05); cursor: pointer; }
-        a { color: var(--accent); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-
-        /* Layer 3 - Post Detail Styles */
+        tr:hover { background: rgba(255,255,255,0.05); cursor: pointer; }
+        .post-title-cell .title { font-weight: 600; margin-bottom: 3px; display: block; }
+        .post-title-cell .description { color: var(--subtle); font-size: 0.85rem; display: block; line-height: 1.4; }
+        #recent-posts-card table th, #recent-posts-card table td { padding: 8px 0; border-bottom: 1px solid #3a3a3a; }
         #post-content h1 { font-size: 2.5rem; margin-top: 0; }
         .meta { color: var(--subtle); margin-bottom: 20px; font-size: 0.9rem; }
         .content-container { border: 1px solid #333; border-radius: 6px; margin-bottom: 30px; overflow: hidden; }
         #cryptpad-embed { width: 100%; height: 80vh; border: none; background: #1a1a1a; display: block; }
         #static-content { padding: 20px; line-height: 1.7; background: var(--card); }
-        .comments { margin-top: 30px; }
+        .platform-tabs { display: flex; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; background: transparent; border: none; color: var(--subtle); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s ease; }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
+    <div id="app-container"><h1>Loading Application...</h1></div>
 
-    <!-- This is the container where all views will be loaded into -->
-    <div id="app-container">
-        <!-- Content from hub.html, posts.html, or post.html will be injected here -->
-    </div>
+    <script async src="https://platform.twitter.com/widgets.js"></script>
 
-    <!-- 💡 JAVASCRIPT LOGIC AND DATA -->
     <script>
-        // === CORE DATA (Scalable Content) ===
         const POSTS_DATA = [
-            { id: "archetype", title: "The Male Archetype in Modern Society", date: "2025-11-09", tags: ["philosophy", "gender"], category: "essays", cryptpad_url: "https://cryptpad.fr/pad/#/2/pad/view/ABC123/" },
-            { id: "truth-blogging", title: "Truth Social as Macro-Blogging", date: "2025-11-05", tags: ["social media"], category: "rants", content: '<p>Truth Social occupies a unique niche, proving that a single-author, non-interactive format can still drive conversation. This is static HTML content.</p>' },
-            { id: "rant-1", title: "Why Modern Dating is Broken", date: "2025-11-03", tags: ["rant", "relationships"], category: "rants", cryptpad_url: "https://cryptpad.fr/code/#/2/code/view/XYZ789/" },
-            { id: "research-1", title: "Data on Male Loneliness (2025)", date: "2025-11-01", tags: ["data", "psychology"], category: "research", content: '<p>Recent studies show a sharp rise in self-reported male loneliness. See the source <a href="#">here</a>.</p>' },
-            // ADD MORE POSTS HERE TO SCALE YOUR SITE
+            { id: "archetype", title: "The Male Archetype in Modern Society", description: "A long-form reflection on power dynamics and identity.", date: "2025-11-09", tags: ["philosophy", "gender"], category: "essays", cryptpad_url: "https://cryptpad.fr/pad/#/2/pad/view/ABC123/", x_id: "1987934573683237200", reddit_url: "https://www.reddit.com/r/delhi/comments/1osjg99/theyre_detaining_people/" },
+            { id: "truth-blogging", title: "Truth Social as Macro-Blogging", description: "Analysis of long-form non-interactive posting.", date: "2025-11-05", tags: ["social media"], category: "rants", content: "<p>Truth Social proves single-author format works.</p>", x_id: "1987934573683237200", reddit_url: "https://www.reddit.com/r/delhi/comments/1osjg99/theyre_detaining_people/" },
+            { id: "rant-1", title: "Why Modern Dating is Broken", description: "Raw take on dating apps.", date: "2025-11-03", tags: ["rant"], category: "rants", cryptpad_url: "https://cryptpad.fr/code/#/2/code/view/XYZ789/", x_id: "1987934573683237200", reddit_url: "https://www.reddit.com/r/delhi/comments/1osjg99/theyre_detaining_people/" },
+            { id: "research-1", title: "Data on Male Loneliness (2025)", description: "Statistical rise in loneliness.", date: "2025-11-01", tags: ["data"], category: "research", content: "<p>Sharp rise in self-reported loneliness.</p>", x_id: "1987934573683237200", reddit_url: "https://www.reddit.com/r/delhi/comments/1osjg99/theyre_detaining_people/" }
         ];
 
-        const POSTS_MAP = POSTS_DATA.reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
-        const CATEGORIES = {
-            essays: { title: "📝 Essays", description: "Long-form reflections on power, culture, and identity." },
-            rants: { title: "🔥 Rants", description: "Raw, unfiltered takes on society and hypocrisy." },
-            research: { title: "🔬 Research", description: "Data, sources, and deep analysis." },
-            drafts: { title: "✒️ Drafts", description: "Works in progress — feedback welcome." }
+        window.POSTS_DATA = POSTS_DATA;
+        window.POSTS_MAP = POSTS_DATA.reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+        window.CATEGORIES = {
+            essays: { title: "Essays", description: "Long-form reflections." },
+            rants: { title: "Rants", description: "Raw takes." },
+            research: { title: "Research", description: "Data & analysis." },
+            drafts: { title: "Drafts", description: "WIP." }
         };
 
-        // === Navigation/Routing ===
+        function openTab(btn, tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => { t.classList.remove('active'); t.style.display = 'none'; });
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active'); document.getElementById(tabName).style.display = 'block';
+            if (btn) btn.classList.add('active');
+            if (tabName === 'twitter' && window.twttr) setTimeout(() => twttr.widgets.load(), 100);
+        }
+
+        function initializeEmbeds(post) {
+            const xContainer = document.getElementById('x-embed-container');
+            xContainer.innerHTML = '';
+            if (post.x_id) {
+                if (window.twttr && twttr.widgets) {
+                    twttr.widgets.createTweet(post.x_id, xContainer, { theme: 'dark', conversation: 'all' });
+                } else {
+                    xContainer.innerHTML = `<blockquote class="twitter-tweet">Loading X thread...</blockquote>`;
+                }
+            } else {
+                xContainer.innerHTML = `<p style="color:var(--subtle);">No X thread linked.</p>`;
+            }
+
+            const redditIframe = document.getElementById('reddit-iframe');
+            if (post.reddit_url) {
+                const match = post.reddit_url.match(/\/r\/[^/]+\/comments\/[^/]+/);
+                redditIframe.src = match ? `https://www.reddit.com${match[0]}/embed?theme=dark` : 'about:blank';
+            } else {
+                redditIframe.src = 'about:blank';
+            }
+        }
+
         function navigate(view, params = {}) {
-            const url = new URL(window.location.href.split('?')[0]);
+            const url = new URL(window.location);
             url.searchParams.set('view', view);
-            for (const key in params) { url.searchParams.set(key, params[key]); }
-            history.pushState(params, view, url.toString());
+            Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+            history.pushState(params, '', url);
             render();
         }
 
         window.addEventListener('popstate', render);
-        
-        // === View Loader & Initializers ===
 
-        async function loadView(viewName, params = {}) {
+        async function loadView(name, params = {}) {
             const container = document.getElementById('app-container');
-            container.innerHTML = '<h1>Loading...</h1>'; // Temporary Loading Text
-
+            container.innerHTML = '<h1>Loading...</h1>';
             try {
-                // 1. Fetch the HTML file fragment
-                const response = await fetch(`${viewName}.html`);
-                if (!response.ok) throw new Error(`Could not load ${viewName}.html`);
-                const htmlContent = await response.text();
-                
-                // 2. Inject the HTML into the container
-                container.innerHTML = htmlContent;
-
-                // 3. Run the initializer specific to the loaded view
-                switch (viewName) {
-                    case 'hub':
-                        initHub();
-                        break;
-                    case 'posts':
-                        initPostsTable(params.category);
-                        break;
-                    case 'post':
-                        initPostDetail(params.id);
-                        break;
-                }
-            } catch (error) {
-                container.innerHTML = `<h1>🚨 Error loading content</h1><p>Check the file ${viewName}.html and your console for details.</p>`;
-                console.error("View Load Error:", error);
+                const res = await fetch(`${name}.html`);
+                if (!res.ok) throw new Error();
+                container.innerHTML = await res.text();
+                if (name === 'hub') initHub();
+                if (name === 'posts') initPostsTable(params.category);
+                if (name === 'post') initPostDetail(params.id);
+            } catch (e) {
+                container.innerHTML = `<h1>Error</h1><p>File ${name}.html not found.</p>`;
             }
         }
 
-        // === Layer 1 Initializer: Hub ===
         function initHub() {
             document.getElementById('page-title').textContent = 'Document Hub';
             const content = document.querySelector('.main-content');
-            content.innerHTML = ''; // Clear existing cards
-
-            for (const key in CATEGORIES) {
+            content.innerHTML = '';
+            Object.keys(window.CATEGORIES).forEach(k => {
                 const card = document.createElement('div');
                 card.className = 'doc-card';
-                card.innerHTML = `<div class="doc-title">${CATEGORIES[key].title}</div><div class="doc-description">${CATEGORIES[key].description}</div>`;
-                // Attach event listener after the card is in the DOM
-                card.onclick = () => navigate('posts', { category: key }); 
+                card.innerHTML = `<div class="doc-title">${window.CATEGORIES[k].title}</div><div class="doc-description">${window.CATEGORIES[k].description}</div>`;
+                card.onclick = () => navigate('posts', { category: k });
                 content.appendChild(card);
+            });
+        }
+
+        function initPostsTable(category) {
+            const posts = window.POSTS_DATA.filter(p => p.category === category);
+            const all = window.POSTS_DATA;
+            const sorted = [...all].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            document.getElementById('category-title').textContent = `${window.CATEGORIES[category].title} Posts`;
+            document.getElementById('page-title').textContent = `${window.CATEGORIES[category].title} Posts`;
+
+            const tbody = document.querySelector('#post-table tbody');
+            const render = list => {
+                tbody.innerHTML = '';
+                list.forEach(p => {
+                    const row = tbody.insertRow();
+                    row.dataset.id = p.id;
+                    row.onclick = () => navigate('post', { id: p.id });
+                    row.innerHTML = `<td class="post-title-cell"><span class="title">${p.title}</span><span class="description">${p.description}</span></td><td>${p.date}</td><td>${p.tags.join(', ')}</td>`;
+                });
+            };
+            render(posts);
+
+            document.getElementById('search').oninput = e => {
+                const q = e.target.value.toLowerCase();
+                const filtered = posts.filter(p => `${p.title} ${p.description} ${p.tags.join(' ')} ${p.date}`.toLowerCase().includes(q));
+                render(filtered);
+            };
+
+            const recent = document.querySelector('#recent-posts-card #recent-table tbody');
+            if (recent) {
+                document.getElementById('recent-posts-card').style.display = 'block';
+                recent.innerHTML = '';
+                sorted.slice(0, 10).forEach(p => {
+                    const row = recent.insertRow();
+                    row.onclick = () => navigate('post', { id: p.id });
+                    row.innerHTML = `<td class="post-title-cell"><span class="title">${p.title}</span></td><td>${p.date}</td>`;
+                });
             }
         }
 
-        // === Layer 2 Initializer: Posts Table ===
-        function initPostsTable(category) {
-            const catTitle = CATEGORIES[category] ? CATEGORIES[category].title.replace(/[^a-zA-Z\s]/g, '') : 'All';
-            document.getElementById('category-title').textContent = `${catTitle.trim()} Posts`;
-            document.getElementById('page-title').textContent = `${catTitle.trim()} Posts`;
-            const tbody = document.querySelector('#post-table tbody');
-            tbody.innerHTML = ''; 
-
-            const filteredPosts = POSTS_DATA.filter(p => p.category === category);
-            
-            // Render Posts
-            filteredPosts.forEach(p => {
-                const row = tbody.insertRow();
-                row.dataset.id = p.id;
-                row.onclick = () => navigate('post', { id: p.id }); // Click to Layer 3
-                row.innerHTML = `<td>${p.title}</td><td>${p.date}</td><td>${p.tags.join(', ')}</td>`;
-            });
-
-            // Search/Filter Logic
-            document.getElementById('search').oninput = (e) => {
-                const q = e.target.value.toLowerCase();
-                [...tbody.rows].forEach(row => {
-                    const txt = row.textContent.toLowerCase();
-                    row.style.display = txt.includes(q) ? '' : 'none';
-                });
-            };
-        }
-
-        // === Layer 3 Initializer: Post Detail ===
         function initPostDetail(id) {
-            const post = POSTS_MAP[id];
-            if (!post) { alert('Post not found!'); navigate('hub'); return; }
-            
+            const post = window.POSTS_MAP[id];
+            if (!post) { alert('Post not found'); navigate('hub'); return; }
             document.getElementById('post-title').textContent = post.title;
             document.getElementById('page-title').textContent = post.title;
             document.getElementById('post-meta').textContent = `${post.date} • ${post.tags.join(', ')}`;
 
-            const staticContentDiv = document.getElementById('static-content');
-            const cryptpadIframe = document.getElementById('cryptpad-embed');
-            
-            // Content Logic: CryptPad Embed vs. Static Content
+            const staticDiv = document.getElementById('static-content');
+            const iframe = document.getElementById('cryptpad-embed');
             if (post.cryptpad_url) {
-                staticContentDiv.style.display = 'none';
-                cryptpadIframe.style.display = 'block';
-                const embedUrl = post.cryptpad_url.replace('/edit/', '/view/') + '?embed=1'; 
-                cryptpadIframe.src = embedUrl;
+                staticDiv.style.display = 'none';
+                iframe.style.display = 'block';
+                iframe.src = post.cryptpad_url.replace('/edit/', '/view/') + '?embed=1';
             } else {
-                staticContentDiv.style.display = 'block';
-                cryptpadIframe.style.display = 'none';
-                staticContentDiv.innerHTML = post.content || 'No content available for this post.';
+                staticDiv.style.display = 'block';
+                iframe.style.display = 'none';
+                staticDiv.innerHTML = post.content || 'No content.';
             }
 
-            // Cusdis Comment Setup
-            const cusdisThread = document.getElementById('cusdis_thread');
-            // REPLACE 'YOUR_APP_ID' with your actual Cusdis App ID
-            cusdisThread.dataset.host = "https://cusdis.com"; 
-            cusdisThread.dataset.appId = "YOUR_APP_ID"; // <-- CHANGE THIS
-            cusdisThread.dataset.pageId = post.id;
-            cusdisThread.dataset.pageUrl = window.location.href;
-            cusdisThread.dataset.pageTitle = post.title;
-            
-            // Re-initialize Cusdis for SPA behavior
-            if (window.Cusdis) { window.Cusdis.initial(); }
+            initializeEmbeds(post);
+            openTab(document.querySelector('#twitter-tab-btn'), 'twitter');
         }
 
-
-        // === Main Router Function (Determines which file to load) ===
         function render() {
-            const params = new URLSearchParams(window.location.search);
+            const params = new URLSearchParams(location.search);
             const view = params.get('view') || 'hub';
-
-            switch (view) {
-                case 'hub':
-                case 'posts':
-                case 'post':
-                    loadView(view, { category: params.get('category'), id: params.get('id') });
-                    break;
-                default:
-                    loadView('hub');
-            }
+            const opts = { category: params.get('category'), id: params.get('id') };
+            loadView(view, opts);
         }
 
-        // Initialize App on Load
-        window.onload = () => {
-             // Force an initial render based on the URL or default to 'hub'
-             render();
-        };
-
+        window.onload = render;
     </script>
 </body>
 </html>
