@@ -9,8 +9,6 @@
         :root { 
             --bg: #1e1e1e; 
             --card: #2a2a2a; 
-            --text: #9b9b9b; 
-            --subtle: #6b6464; 
             --accent: #007bff;
             /* Define different font families for different sections */
             --font-main:'SF Mono', 'sans-serif', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue';
@@ -19,7 +17,7 @@
             
             /* Color variables for different sections */
             --text-main: #bdb9b9;
-            --subtle-main: #ac9b9b;
+            --subtle-main: #888888;
             --text-post: #b4a9a9;
             --subtle-post: #888888;
         }
@@ -84,6 +82,13 @@
         @media (min-width: 768px) {
             #static-content {
                 font-family: var(--font-post-desktop);
+            }
+        }
+
+        /* Mobile styles for static content */
+        @media (max-width: 767px) {
+            #static-content {
+                font-size: 80%;
             }
         }
         
